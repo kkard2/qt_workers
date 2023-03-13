@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTableWidget>
 #include <QScrollArea>
+#include <QLabel>
 
 #include "worker.h"
 
@@ -13,6 +14,7 @@ class MainWindow : public QMainWindow {
 private:
     QTableWidget *m_table = nullptr;
     QScrollArea *m_table_container = nullptr;
+    QLabel *m_total_paycheck_label = nullptr;
     std::vector<Worker> m_workers;
 
 public:
@@ -20,6 +22,7 @@ public:
 
 private:
     auto setup() -> void;
+    auto update() -> void;
     auto create_table() -> void;
     auto populate_table() -> void;
 };

@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <numeric>
 
 MainWindow::MainWindow() {
     setup();
@@ -32,7 +33,29 @@ auto MainWindow::setup() -> void {
         Worker("Baz", "Abc", 30.5, 84),
     };
 
+    m_total_paycheck_label = new QLabel;
+    m_total_paycheck_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    main_layout->addWidget(m_total_paycheck_label);
+
+    update();
+}
+
+auto MainWindow::update() -> void {
     populate_table();
+
+    auto total_paycheck = std::accumulate(
+        m_workers.begin(),
+        m_workers.end(),
+        0.0,
+        [](auto acc, const auto &worker) -> auto {
+            return acc + worker.paycheck();
+        }
+    );
+
+    auto total_paycheck_ss = std::stringstream();
+    total_paycheck_ss << std::fixed << std::setprecision(2) << total_paycheck;
+
+    m_total_paycheck_label->setText(QString(("Total paycheck: " + total_paycheck_ss.str()).c_str()));
 }
 
 auto MainWindow::create_table() -> void {
