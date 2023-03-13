@@ -31,6 +31,7 @@ private:
 public slots:
     auto table_selection_changed() -> void;
     auto delete_workers_button_pressed() -> void;
+    auto add_worker_button_pressed() -> void;
 };
 
 #endif // MAINWINDOW_H

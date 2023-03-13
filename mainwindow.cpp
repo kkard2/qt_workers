@@ -10,6 +10,8 @@
 #include <numeric>
 #include <set>
 
+#include "addworkerdialog.h"
+
 MainWindow::MainWindow() {
     setup();
 }
@@ -29,23 +31,14 @@ auto MainWindow::setup() -> void {
     m_table_container->setWidgetResizable(true);
     main_layout->addWidget(m_table_container);
 
-    m_workers = {
-        Worker("Foo", "Bar", 20.5, 1),
-        Worker("Baz", "Abc", 30.5, 2),
-        Worker("Baz", "Abc", 30.5, 3),
-        Worker("Baz", "Abc", 30.5, 4),
-        Worker("Baz", "Abc", 30.5, 5),
-        Worker("Baz", "Abc", 30.5, 6),
-        Worker("Baz", "Abc", 30.5, 7),
-        Worker("Baz", "Abc", 30.5, 8),
-        Worker("Baz", "Abc", 30.5, 9),
-    };
-
     auto bottom_row_layout = new QHBoxLayout;
     main_layout->addLayout(bottom_row_layout);
 
     m_delete_workers_button = new QPushButton(QString("Remove worker(s)"));
     bottom_row_layout->addWidget(m_delete_workers_button);
+
+    auto add_worker_button = new QPushButton(QString("Add worker"));
+    bottom_row_layout->addWidget(add_worker_button);
 
     m_total_paycheck_label = new QLabel;
     m_total_paycheck_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -55,6 +48,7 @@ auto MainWindow::setup() -> void {
 
     connect(m_table, &QTableWidget::itemSelectionChanged, this, &MainWindow::table_selection_changed);
     connect(m_delete_workers_button, &QPushButton::pressed, this, &MainWindow::delete_workers_button_pressed);
+    connect(add_worker_button, &QPushButton::pressed, this, &MainWindow::add_worker_button_pressed);
 
     update();
 }
@@ -156,5 +150,18 @@ auto MainWindow::delete_workers_button_pressed() -> void {
         m_workers.erase(m_workers.begin() + rows_vector[i]);
     }
 
+    update();
+}
+
+auto MainWindow::add_worker_button_pressed() -> void {
+    auto dialog = AddWorkerDialog(this);
+    auto result = dialog.exec();
+
+    if (result != QDialog::Accepted) {
+        return;
+    }
+
+    auto &worker = dialog.worker();
+    m_workers.push_back(*worker);
     update();
 }

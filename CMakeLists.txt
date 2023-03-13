@@ -18,6 +18,8 @@ set(PROJECT_SOURCES
         mainwindow.h
         worker.cpp
         worker.h
+        addworkerdialog.cpp
+        addworkerdialog.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
