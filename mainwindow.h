@@ -2,20 +2,26 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTableWidget>
+#include <QScrollArea>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
+#include "worker.h"
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
+private:
+    QTableWidget *m_table = nullptr;
+    QScrollArea *m_table_container = nullptr;
+    std::vector<Worker> m_workers;
+
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    auto setup() -> void;
+    auto create_table() -> void;
+    auto populate_table() -> void;
 };
+
 #endif // MAINWINDOW_H
