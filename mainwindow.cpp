@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <numeric>
+#include <set>
 
 MainWindow::MainWindow() {
     setup();
@@ -29,13 +30,31 @@ auto MainWindow::setup() -> void {
     main_layout->addWidget(m_table_container);
 
     m_workers = {
-        Worker("Foo", "Bar", 20.5, 42),
-        Worker("Baz", "Abc", 30.5, 84),
+        Worker("Foo", "Bar", 20.5, 1),
+        Worker("Baz", "Abc", 30.5, 2),
+        Worker("Baz", "Abc", 30.5, 3),
+        Worker("Baz", "Abc", 30.5, 4),
+        Worker("Baz", "Abc", 30.5, 5),
+        Worker("Baz", "Abc", 30.5, 6),
+        Worker("Baz", "Abc", 30.5, 7),
+        Worker("Baz", "Abc", 30.5, 8),
+        Worker("Baz", "Abc", 30.5, 9),
     };
+
+    auto bottom_row_layout = new QHBoxLayout;
+    main_layout->addLayout(bottom_row_layout);
+
+    m_delete_workers_button = new QPushButton(QString("Remove worker(s)"));
+    bottom_row_layout->addWidget(m_delete_workers_button);
 
     m_total_paycheck_label = new QLabel;
     m_total_paycheck_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    main_layout->addWidget(m_total_paycheck_label);
+    bottom_row_layout->addWidget(m_total_paycheck_label);
+
+    create_table();
+
+    connect(m_table, &QTableWidget::itemSelectionChanged, this, &MainWindow::table_selection_changed);
+    connect(m_delete_workers_button, &QPushButton::pressed, this, &MainWindow::delete_workers_button_pressed);
 
     update();
 }
@@ -56,6 +75,8 @@ auto MainWindow::update() -> void {
     total_paycheck_ss << std::fixed << std::setprecision(2) << total_paycheck;
 
     m_total_paycheck_label->setText(QString(("Total paycheck: " + total_paycheck_ss.str()).c_str()));
+
+    m_delete_workers_button->setEnabled(!m_table->selectedItems().empty());
 }
 
 auto MainWindow::create_table() -> void {
@@ -77,12 +98,16 @@ auto MainWindow::create_table() -> void {
 }
 
 auto MainWindow::populate_table() -> void {
-    if (m_table == nullptr) {
-        create_table();
-    } else {
-        m_table->clearContents();
+    m_table->blockSignals(true);
+
+    auto selected_items = m_table->selectedItems();
+    auto selected_item_rows = std::vector<int>();
+
+    for (const auto &item : selected_items) {
+        selected_item_rows.push_back(item->row());
     }
 
+    m_table->clearContents();
     m_table->setRowCount(static_cast<int>(m_workers.size()));
 
     for (size_t i = 0; i < m_workers.size(); ++i) {
@@ -101,5 +126,35 @@ auto MainWindow::populate_table() -> void {
         paycheck_ss << std::fixed << std::setprecision(2) << worker.paycheck();
         m_table->setItem(i_signed, 4, new QTableWidgetItem(QString(paycheck_ss.str().c_str())));
     }
+
+    for (const auto &row : selected_item_rows) {
+        if (row < m_table->rowCount()) {
+            m_table->selectRow(row);
+        }
+    }
+
+    m_table->blockSignals(false);
 }
 
+auto MainWindow::table_selection_changed() -> void {
+    update();
+}
+
+auto MainWindow::delete_workers_button_pressed() -> void {
+    auto selected_items = m_table->selectedItems();
+    auto rows = std::set<int>();
+
+    for (const auto &item : selected_items) {
+        rows.insert(item->row());
+    }
+
+    auto rows_vector = std::vector(rows.begin(), rows.end());
+
+    std::sort(rows_vector.begin(), rows_vector.end());
+
+    for (int i = static_cast<int>(rows_vector.size()) - 1; i >= 0; i--) {
+        m_workers.erase(m_workers.begin() + rows_vector[i]);
+    }
+
+    update();
+}
