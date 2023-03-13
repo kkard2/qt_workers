@@ -34,10 +34,10 @@ auto MainWindow::setup() -> void {
     auto bottom_row_layout = new QHBoxLayout;
     main_layout->addLayout(bottom_row_layout);
 
-    m_delete_workers_button = new QPushButton(QString("Remove worker(s)"));
+    m_delete_workers_button = new QPushButton("Remove worker(s)");
     bottom_row_layout->addWidget(m_delete_workers_button);
 
-    auto add_worker_button = new QPushButton(QString("Add worker"));
+    auto add_worker_button = new QPushButton("Add worker");
     bottom_row_layout->addWidget(add_worker_button);
 
     m_total_paycheck_label = new QLabel;
@@ -68,7 +68,7 @@ auto MainWindow::update() -> void {
     auto total_paycheck_ss = std::stringstream();
     total_paycheck_ss << std::fixed << std::setprecision(2) << total_paycheck;
 
-    m_total_paycheck_label->setText(QString(("Total paycheck: " + total_paycheck_ss.str()).c_str()));
+    m_total_paycheck_label->setText(QString::fromStdString("Total paycheck: " + total_paycheck_ss.str()));
 
     m_delete_workers_button->setEnabled(!m_table->selectedItems().empty());
 }
@@ -83,11 +83,11 @@ auto MainWindow::create_table() -> void {
 
     m_table->setColumnCount(5);
     m_table->setHorizontalHeaderLabels({
-        QString("First name"),
-        QString("Last name"),
-        QString("Hourly rate"),
-        QString("Hours total"),
-        QString("Paycheck"),
+        "First name",
+        "Last name",
+        "Hourly rate",
+        "Hours total",
+        "Paycheck",
     });
 }
 
@@ -107,18 +107,18 @@ auto MainWindow::populate_table() -> void {
     for (size_t i = 0; i < m_workers.size(); ++i) {
         auto i_signed = static_cast<int>(i);
         const auto &worker = m_workers[i];
-        m_table->setItem(i_signed, 0, new QTableWidgetItem(QString(worker.first_name().c_str())));
-        m_table->setItem(i_signed, 1, new QTableWidgetItem(QString(worker.last_name().c_str())));
+        m_table->setItem(i_signed, 0, new QTableWidgetItem(QString::fromStdString(worker.first_name())));
+        m_table->setItem(i_signed, 1, new QTableWidgetItem(QString::fromStdString(worker.last_name())));
 
         auto hourly_rate_ss = std::stringstream();
         hourly_rate_ss << std::fixed << std::setprecision(2) << worker.hourly_rate();
-        m_table->setItem(i_signed, 2, new QTableWidgetItem(QString(hourly_rate_ss.str().c_str())));
+        m_table->setItem(i_signed, 2, new QTableWidgetItem(QString::fromStdString(hourly_rate_ss.str())));
 
-        m_table->setItem(i_signed, 3, new QTableWidgetItem(QString(std::to_string(worker.hours_total()).c_str())));
+        m_table->setItem(i_signed, 3, new QTableWidgetItem(QString::fromStdString(std::to_string(worker.hours_total()))));
 
         auto paycheck_ss = std::stringstream();
         paycheck_ss << std::fixed << std::setprecision(2) << worker.paycheck();
-        m_table->setItem(i_signed, 4, new QTableWidgetItem(QString(paycheck_ss.str().c_str())));
+        m_table->setItem(i_signed, 4, new QTableWidgetItem(QString::fromStdString(paycheck_ss.str())));
     }
 
     for (const auto &row : selected_item_rows) {
